@@ -1,26 +1,39 @@
-let url = "https://quote-garden.onrender.com/api/v3/quotes/random";
-let btn = document.getElementById("btn");
+const url = "https://dummyjson.com/quotes/random";
+const btn = document.getElementById("btn");
 
-btn.addEventListener("click", async() => {
-    let quote = await getQuote();
-    console.log(quote[0]);
-    console.log(quote[1]);
+btn.addEventListener("click", async () => {
+    const data = await getQuote();
 
-    let qt = document.querySelector("#quote");
-    // let ans = quote[0].toUpperCase();
-    qt.innerHTML = '"' + quote[0] + '"';
+    if (!data) {
+        document.getElementById("quote").innerText = "UNABLE TO FETCH A QUOTE.";
+        document.getElementById("author").innerText = "";
+        return;
+    }
 
-    let ath = document.querySelector("#author");
-    ath.innerText = "- " + quote[1];
+    document.getElementById("quote").innerText = `"${data.quote}"`;
+    document.getElementById("author").innerText = `- ${data.author}`;
 });
 
 async function getQuote() {
     try {
-        let res = await fetch(url);
-        let data = await res.json();
+        const res = await fetch(url);
 
-        return [data.data[0].quoteText, data.data[0].quoteAuthor];
-    } catch (e) {
-        console.log("error - ", e);
+        if (!res.ok) {
+            throw new Error("Network response was not OK");
+        }
+
+        const data = await res.json();
+
+        return {
+            quote: data.quote,
+            author: data.author
+        };
+
+    } catch (err) {
+        console.error(err);
+        return null;
     }
+
+    
 }
+
